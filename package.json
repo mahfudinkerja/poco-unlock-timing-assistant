@@ -1,0 +1,29 @@
+{
+  "name": "poco-unlock-timing-assistant",
+  "productName": "POCO Unlock Timing Assistant",
+  "version": "0.1.0",
+  "description": "Desktop timing dashboard for POCO / HyperOS bootloader unlock attempts",
+  "main": "src/main.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check src/main.js && node --check src/preload.js && node --check src/adb.js && node --check src/ntp.js && node --check renderer/app.js",
+    "dist:win": "electron-builder --win nsis"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.poco.unlocktiming",
+    "productName": "POCO Unlock Timing Assistant",
+    "files": [
+      "src/**/*",
+      "renderer/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
