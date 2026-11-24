@@ -1,5 +1,22 @@
-node_modules/
-dist/
-out/
+# Build output
+bin/
+obj/
+artifacts/
+publish/
+
+# Local .NET SDK (installed per-machine into the repo to avoid touching the system)
+.dotnet/
+.scratch/
+
+# Legacy Electron prototype dependencies (kept for reference only)
+legacy/electron-prototype/node_modules/
+legacy/electron-prototype/dist/
+legacy/electron-prototype/out/
+
+# Logs / evidence produced at runtime
+logs/
 *.log
+
+# OS
 .DS_Store
+Thumbs.db

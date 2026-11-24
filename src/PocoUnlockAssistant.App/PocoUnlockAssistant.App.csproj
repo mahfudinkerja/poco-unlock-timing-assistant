@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <RootNamespace>PocoUnlockAssistant.App</RootNamespace>
+    <AssemblyName>PocoUnlockAssistant</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <Version>0.1.0</Version>
+    <Product>POCO Unlock Timing Assistant</Product>
+    <Company>POCO Unlock Timing Assistant</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PocoUnlockAssistant.Core\PocoUnlockAssistant.Core.csproj" />
+    <ProjectReference Include="..\PocoUnlockAssistant.Infrastructure\PocoUnlockAssistant.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="11.0.0" />
+  </ItemGroup>
+</Project>
