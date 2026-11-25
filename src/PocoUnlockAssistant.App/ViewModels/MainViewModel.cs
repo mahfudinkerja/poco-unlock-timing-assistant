@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -172,7 +173,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public bool IsMiUnlock => SelectedSection == 4;
     public bool IsAbout => SelectedSection == 5;
 
-    public string AppVersion => "0.1.0";
+    public string AppVersion => Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0";
 
     public string AboutText =>
         "POCO Unlock Timing Assistant prepares and submits the official Xiaomi Community " +
@@ -741,8 +742,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Settings.MaxUncertaintyMs = Math.Max(10, Settings.MaxUncertaintyMs);
         _coordinator.Settings = Settings;
         _settingsStore.Save(Settings);
+        if (_adb is AdbClient adb)
+        {
+            adb.UseAdbPath(Settings.AdbPath);
+        }
+
         _cachedTarget = default;
-        StatusMessage = "Settings saved. Target time is applied to the next arm.";
+        StatusMessage = $"Settings saved. adb: {(_adb as AdbClient)?.Executable ?? "configured"}. Target time applies to the next arm.";
     }
 
     // ---- Mi Unlock Tool --------------------------------------------------

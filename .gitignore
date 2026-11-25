@@ -3,6 +3,7 @@ bin/
 obj/
 artifacts/
 publish/
+installer/Output/
 
 # Local .NET SDK (installed per-machine into the repo to avoid touching the system)
 .dotnet/

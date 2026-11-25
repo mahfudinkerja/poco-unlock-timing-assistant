@@ -16,7 +16,7 @@ public sealed class AdbClient : IAdbClient
     private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(20);
 
     private readonly ILogger<AdbClient> _logger;
-    private readonly string _executable;
+    private string _executable;
 
     public AdbClient(string? adbPath = null, ILogger<AdbClient>? logger = null)
     {
@@ -25,6 +25,9 @@ public sealed class AdbClient : IAdbClient
     }
 
     public string Executable => _executable;
+
+    /// <summary>Re-resolves adb after the operator changes Adb Path in Settings.</summary>
+    public void UseAdbPath(string? configured) => _executable = ResolveExecutable(configured);
 
     public static string ResolveExecutable(string? configured)
     {

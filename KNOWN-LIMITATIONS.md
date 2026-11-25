@@ -2,12 +2,11 @@
 
 ## Not verified on hardware or Windows
 
-1. **The WPF UI has never been run.** It compiles (including XAML) and was cross-published for
-   `win-x64`, but this project was built on macOS without a Windows host. Layout, DPI scaling,
-   fonts, the live 50 ms countdown and every button still need a first run on Windows 10/11.
-   The window is now clamped to `SystemParameters.WorkArea` and its minimum size was reduced so it
-   can fit 1920x1080 at 125% (1536x864 DIPs) and 150% (1280x720 DIPs) — but that is a reasoned fix,
-   **not an observed one**.
+1. **The WPF UI was launched on Windows (2026-11-25).** Both the portable and the installed exe
+   open a real window and complete startup, including live NTP sync. Layout, DPI scaling at
+   100/125/150%, fonts, the live 50 ms countdown and every button still need a visual pass. The
+   window is clamped to `SystemParameters.WorkArea` and its minimum size reduced to fit 1920x1080
+   at 125% (1536x864 DIPs) and 150% (1280x720 DIPs) — a reasoned fix, **not an observed one**.
 2. **No POCO F7 was attached.** The ADB client itself was exercised live (`adb 1.0.41` detected,
    `NotAttached` reported correctly), but `getprop`, `dumpsys`, `uiautomator dump`, `screencap` and
    `input tap` have not been executed against a real HyperOS 3 device.
@@ -19,10 +18,10 @@
 
 ## Functional gaps
 
-5. **The installer exists only as a script.** `installer/PocoUnlockAssistant.iss` (Inno Setup 6.3+)
-   covers shortcuts, uninstall and AppData preservation, but it has never been compiled with `iscc`
-   or run, and clean-install / upgrade / uninstall behaviour is unverified. A Windows build host is
-   required.
+5. **The installer was compiled and clean-installed (2026-11-25).** `installer/PocoUnlockAssistant.iss`
+   built with Inno Setup 6.7.4; a silent install to `C:\Program Files\PocoUnlockAssistant` created
+   shortcuts and an uninstall entry and the installed exe launched successfully. In-place upgrade
+   and uninstall were not exercised.
 6. **No Windows sleep/restart recovery or auto-start.** The app is a foreground desktop app:
    it cannot execute while the PC is asleep or powered off, it does not replay a missed window,
    and the startup-recovery option is not implemented (no fake setting is exposed for it).

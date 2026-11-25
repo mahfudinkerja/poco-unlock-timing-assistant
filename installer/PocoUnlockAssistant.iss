@@ -58,7 +58,10 @@ Source: "{#PayloadDir}\*.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsour
 Source: "{#PayloadDir}\*.json"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "..\README.md"; DestDir: "{app}"; Flags: ignoreversion isreadme skipifsourcedoesntexist
 Source: "..\KNOWN-LIMITATIONS.md"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "..\docs\*"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist
+Source: "..\ARCHITECTURE.md"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "..\CHANGELOG.md"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "..\IMPLEMENTATION-PLAN.md"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "..\QA-REPORT.md"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -68,7 +71,5 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
-[UninstallDelete]
-; Only files the installer itself created outside {app}. User data in
-; %APPDATA%\PocoUnlockAssistant is deliberately preserved.
-Type: filesandordirs; Name: "{app}\docs"
+; No [UninstallDelete] entries: user data in %APPDATA%\PocoUnlockAssistant is
+; deliberately preserved, and everything else lives under {app}.

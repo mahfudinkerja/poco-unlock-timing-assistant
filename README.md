@@ -73,6 +73,22 @@ Security note: `Microsoft.Data.Sqlite` is pinned to `10.0.15` because earlier 10
 SQLite older than 3.50.2, which is affected by CVE-2025-6965. Re-run
 `dotnet list package --vulnerable --include-transitive` when updating dependencies.
 
+## Go-live status (Windows, verified 2026-11-25)
+
+| Artifact | Path |
+| --- | --- |
+| Portable app | `artifacts\win-x64\PocoUnlockAssistant.exe` (self-contained, 141 MB) |
+| Installer | `installer\Output\PocoUnlockAssistantSetup-0.1.1.exe` (45 MB) |
+
+Verified on this Windows host: clean build (0 warnings), 60/60 tests, both executables launch with a real window, live NTP sync against Cloudflare and pool.ntp.org, silent clean install to `C:\Program Files\PocoUnlockAssistant` with Start-menu/desktop shortcuts and a working uninstall entry. adb 1.0.41 is installed at `C:\Tools\Android\platform-tools\adb.exe` and wired through `%APPDATA%\PocoUnlockAssistant\settings.json`.
+
+Still requires the physical device (cannot be verified in this environment):
+
+1. Connect the POCO F7 with USB debugging authorized, then press **CONNECT DEVICE**.
+2. Confirm the package id and screen markers with **Diagnostics → Inspect screen**; edit `%APPDATA%\PocoUnlockAssistant\screen-profile.json` if they differ (especially for a Chinese-locale UI).
+3. Sign in to Xiaomi Community manually and navigate to **Me → Unlock Bootloader**.
+4. Press **CHECK READINESS**, then **ARM SCHEDULER**, and keep the PC awake until 00:00:00 CST / 23:00 WIB.
+
 ## Using the dashboard
 
 1. **CONNECT DEVICE** — verifies adb, USB, authorization, HyperOS version and battery.
