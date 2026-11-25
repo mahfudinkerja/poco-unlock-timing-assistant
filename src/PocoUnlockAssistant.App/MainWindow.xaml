@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="POCO Unlock Timing Assistant"
-        Width="1320" Height="880" MinWidth="1120" MinHeight="760"
+        Width="1320" Height="860" MinWidth="960" MinHeight="560"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None" Background="{StaticResource BgBrush}"
         Foreground="{StaticResource TextBrush}"

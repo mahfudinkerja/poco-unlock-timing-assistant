@@ -15,7 +15,7 @@ It synchronizes Windows time against NTP, counts down with a monotonic clock, ve
 | Time | Multi-server SNTP client + `Stopwatch`-based monotonic clock |
 | Device | Android Platform Tools (`adb`), UIAutomator hierarchy, `screencap` |
 | Persistence | SQLite (`Microsoft.Data.Sqlite`) with CSV/JSON export |
-| Tests | xUnit (57 tests) |
+| Tests | xUnit (60 tests) |
 
 ## Layout
 
@@ -24,6 +24,7 @@ src/PocoUnlockAssistant.Core/            domain: time math, state machine, recog
 src/PocoUnlockAssistant.Infrastructure/  adb, ntp, uiautomator, sqlite, settings, file logging
 src/PocoUnlockAssistant.App/             WPF app: theme, dashboard, view models
 tests/PocoUnlockAssistant.Tests/         time, adb parsing, automation, scheduler, persistence
+installer/PocoUnlockAssistant.iss        Inno Setup script for the installer build
 legacy/electron-prototype/               earlier Electron UI prototype (reference only, not used)
 ARCHITECTURE.md  IMPLEMENTATION-PLAN.md  QA-REPORT.md  KNOWN-LIMITATIONS.md  CHANGELOG.md
 ```
@@ -56,6 +57,21 @@ dotnet publish src/PocoUnlockAssistant.App/PocoUnlockAssistant.App.csproj \
 ```
 
 The WPF project sets `EnableWindowsTargeting`, so it can be **compiled** on macOS/Linux, but the UI only **runs** on Windows.
+
+Installer (run on Windows with [Inno Setup](https://jrsoftware.org/isinfo.php) 6.3+ after the publish above):
+
+```bat
+iscc installer\PocoUnlockAssistant.iss
+:: → installer\Output\PocoUnlockAssistantSetup-0.1.1.exe
+```
+
+The installer creates Start-menu and optional desktop shortcuts and uninstalls cleanly. Your data in
+`%APPDATA%\PocoUnlockAssistant` (history database, settings, logs, evidence) is **preserved** on
+uninstall and across upgrades, so the duplicate-submission guard keeps working after reinstalling.
+
+Security note: `Microsoft.Data.Sqlite` is pinned to `10.0.15` because earlier 10.0.x releases bundled
+SQLite older than 3.50.2, which is affected by CVE-2025-6965. Re-run
+`dotnet list package --vulnerable --include-transitive` when updating dependencies.
 
 ## Using the dashboard
 

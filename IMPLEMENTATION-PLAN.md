@@ -19,7 +19,9 @@ physical POCO F7 — see KNOWN-LIMITATIONS.
 | 8 | Database and audit history | ✅ SQLite schema with all specified columns, CSV/JSON export, restart-safe duplicate check |
 | 9 | Mi Unlock Tool assistance | ✅ section with mandatory data-loss warning, fastboot check, browse/launch with confirmation, official download link, binding and waiting-period instructions; ⚠️ fastboot absent on this host |
 | 10 | Comprehensive QA and real-device verification | ⚠️ 60 automated tests pass; real-device verification impossible here |
-| 11 | Production installer and portable executable | ⚠️ portable self-contained `win-x64` single-file exe published; installer not produced (needs WiX/Inno Setup on Windows) |
+| 11 | Production installer and portable executable | ⚠️ portable self-contained `win-x64` single-file exe published (135 MB); Inno Setup script added (`installer/PocoUnlockAssistant.iss`) but never compiled |
+| 12 | **Phase 2 audit**: dependency security, Windows-readiness review | ✅ NU1903/CVE-2025-6965 fixed by `Microsoft.Data.Sqlite` 10.0.15 (verified at runtime: SQLite 3.53.3); audit clean; 91/91 XAML bindings resolve; DPI/size defect fixed; README test count corrected |
+| 13 | **Phase 2 Windows runtime + POCO F7 validation** | ❌ **BLOCKED** — no Windows host and no attached device on this machine. See QA-REPORT §5 |
 
 ## Files created
 
@@ -52,6 +54,9 @@ src/PocoUnlockAssistant.App/
 
 tests/PocoUnlockAssistant.Tests/
   TimeTests.cs  AdbParsingTests.cs  AutomationTests.cs  SchedulerTests.cs  NtpPacketTests.cs  Fakes.cs
+
+installer/
+  PocoUnlockAssistant.iss      Inno Setup 6.3+ script (not yet compiled)
 ```
 
 The earlier Electron prototype was moved to `legacy/electron-prototype/` (kept for reference, not
@@ -59,20 +64,28 @@ built, not part of the solution).
 
 ## Build and test results
 
-- `dotnet build PocoUnlockAssistant.sln` → succeeded, 0 C# warnings, 0 errors.
-- `dotnet test` → 60 passed, 0 failed (4 s).
-- `dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true` → succeeded.
-- Live: NTP `Healthy` (3 responders, ±2.7–8.3 ms uncertainty); ADB detected, no device (expected).
+- `dotnet build PocoUnlockAssistant.sln` → succeeded, **0 warnings**, 0 errors (NU1903 gone).
+- `dotnet test` → 60 passed, 0 failed (4 s), before and after the dependency upgrade.
+- `dotnet list package --vulnerable --include-transitive` → no vulnerable packages in any project.
+- `dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true` → succeeded,
+  `artifacts/win-x64/PocoUnlockAssistant.exe` 135 MB.
+- Live: NTP `Healthy` (3 responders, +79.3 ms offset, 8.4 ms uncertainty); `adb devices -l` empty.
 
 ## Remaining work (in order)
 
-1. Run the app on Windows 10/11: verify layout, DPI, fonts, countdown smoothness, all buttons.
-2. Attach the POCO F7: verify model/HyperOS/serial/battery/screen, then
-   `Diagnostics → Inspect current screen` and correct `screen-profile.json`.
-3. Do a monitored dry run (Monitoring mode) at a non-target time to confirm recognition and that
-   no tap happens.
-4. Ship an installer (WiX MSI or Inno Setup) from a Windows build host.
-5. Optional: scrcpy monitoring pane, Windows startup/sleep recovery helpers, Chinese locale markers.
+These are the Phase 2 gates that could not be executed here; each needs the named hardware.
+
+1. **Windows host** — run `PocoUnlockAssistant.exe` on Windows 10 and 11 at 100/125/150% on
+   1920x1080 and 2560x1440: title bar, all cards, all seven buttons, every section, shutdown,
+   exception handling. Capture screenshots.
+2. **POCO F7** — authorize USB debugging, run the Diagnostics inspector, then replace the assumed
+   `com.miui.community` package id and marker strings with observed values in `screen-profile.json`.
+3. **Device gate matrix** — unauthorized, offline, USB unplug/replug during preparation, wrong
+   screen, CAPTCHA; confirm the tap is always blocked.
+4. **Dry run** — Monitoring mode at a non-target time: recognition runs, no tap is sent.
+5. **Installer** — compile `installer/PocoUnlockAssistant.iss` with Inno Setup 6.3+, then verify
+   clean install, upgrade over 0.1.0 data, uninstall (AppData preserved), shortcuts.
+6. Optional: scrcpy monitoring pane, Windows startup/sleep recovery helpers, Chinese locale markers.
 
 ## Risks
 
@@ -80,4 +93,5 @@ built, not part of the solution).
   profile is configurable, but recognition is inherently brittle.
 - `adb shell input tap` latency is device-dependent and can push the action past the reset instant.
 - Xiaomi's server-side quota/eligibility rules are out of this application's control.
-- The transitive SQLite advisory (NU1903) remains until an updated bundle is released.
+- The bundled SQLite was upgraded to 3.53.3 to clear CVE-2025-6965; new SQLite advisories should be
+  re-audited each release (`dotnet list package --vulnerable --include-transitive`).

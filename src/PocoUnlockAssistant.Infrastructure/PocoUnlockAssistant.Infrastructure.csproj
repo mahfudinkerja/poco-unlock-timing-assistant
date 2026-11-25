@@ -7,7 +7,9 @@
     <ProjectReference Include="..\PocoUnlockAssistant.Core\PocoUnlockAssistant.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
+    <!-- 10.0.15 is the first 10.0.x patch that references SQLitePCLRaw 2.1.13, which bundles
+         SQLite 3.53.x and clears GHSA-2m69-gcr7-jv3q / CVE-2025-6965 (NU1903). -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.15" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.15" />
   </ItemGroup>
 </Project>

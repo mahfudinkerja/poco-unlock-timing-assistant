@@ -5,6 +5,9 @@
 1. **The WPF UI has never been run.** It compiles (including XAML) and was cross-published for
    `win-x64`, but this project was built on macOS without a Windows host. Layout, DPI scaling,
    fonts, the live 50 ms countdown and every button still need a first run on Windows 10/11.
+   The window is now clamped to `SystemParameters.WorkArea` and its minimum size was reduced so it
+   can fit 1920x1080 at 125% (1536x864 DIPs) and 150% (1280x720 DIPs) — but that is a reasoned fix,
+   **not an observed one**.
 2. **No POCO F7 was attached.** The ADB client itself was exercised live (`adb 1.0.41` detected,
    `NotAttached` reported correctly), but `getprop`, `dumpsys`, `uiautomator dump`, `screencap` and
    `input tap` have not been executed against a real HyperOS 3 device.
@@ -16,8 +19,10 @@
 
 ## Functional gaps
 
-5. **No installer.** Only a portable, self-contained single-file executable is produced.
-   An MSI/NSIS package needs a Windows build host (WiX/Inno Setup) and was not created.
+5. **The installer exists only as a script.** `installer/PocoUnlockAssistant.iss` (Inno Setup 6.3+)
+   covers shortcuts, uninstall and AppData preservation, but it has never been compiled with `iscc`
+   or run, and clean-install / upgrade / uninstall behaviour is unverified. A Windows build host is
+   required.
 6. **No Windows sleep/restart recovery or auto-start.** The app is a foreground desktop app:
    it cannot execute while the PC is asleep or powered off, it does not replay a missed window,
    and the startup-recovery option is not implemented (no fake setting is exposed for it).
@@ -42,9 +47,19 @@
 16. If no verified clickable button exists, or NTP uncertainty exceeds the configured limit, the
     app refuses to submit and tells you to fall back to manual submission.
 
-## Dependency advisory
+## Dependency advisory — resolved in 0.1.1
 
-17. `dotnet` reports **NU1903** for transitive `SQLitePCLRaw.lib.e_sqlite3 2.1.11`
-    (GHSA-2m69-gcr7-jv3q), pulled in by `Microsoft.Data.Sqlite 10.0.0`. No patched version is
-    available through that package line yet; re-evaluate when Microsoft ships an updated bundle or
-    pin a newer `SQLitePCLRaw.bundle_e_sqlite3` once released.
+17. ~~NU1903 for transitive `SQLitePCLRaw.lib.e_sqlite3 2.1.11` (GHSA-2m69-gcr7-jv3q / CVE-2025-6965)~~
+    **Fixed** by upgrading `Microsoft.Data.Sqlite` 10.0.0 → 10.0.15, which pulls `SQLitePCLRaw 2.1.13`
+    and bundles SQLite 3.53.3 (≥ 3.50.2). Verified at runtime via `select sqlite_version()` and by
+    a clean `dotnet list package --vulnerable --include-transitive` on all four projects. Nothing
+    was suppressed. Re-run the audit on each release, since new SQLite advisories appear regularly.
+
+## Not exercised even on this host
+
+18. **Windows-specific network and clock behaviour** (NTP through the Windows stack, a manual
+    Windows clock change mid-countdown, sleep/resume) is untested; the live NTP evidence is from
+    macOS.
+19. **No real ADB workflow was executed.** `adb devices -l` runs and correctly reports zero
+    devices, but `getprop`, `dumpsys`, `uiautomator dump`, `screencap`, `input tap`, USB
+    disconnect/reconnect, unauthorized and offline states were only simulated in unit tests.

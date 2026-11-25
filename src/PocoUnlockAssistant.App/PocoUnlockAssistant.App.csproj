@@ -8,7 +8,7 @@
     <AssemblyName>PocoUnlockAssistant</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Product>POCO Unlock Timing Assistant</Product>
     <Company>POCO Unlock Timing Assistant</Company>
   </PropertyGroup>

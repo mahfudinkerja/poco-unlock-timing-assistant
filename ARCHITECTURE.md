@@ -106,3 +106,18 @@ The view model owns a `DispatcherTimer` (50 ms tick, clocks refreshed once per s
 background coordinator events back to the UI thread through `Dispatcher.BeginInvoke`. The scheduled
 run lives in a `Task` guarded by a `CancellationTokenSource`; closing the window disposes it, and
 `EmergencyStop` is checked inside both wait loops.
+
+The window is per-monitor DPI aware (`app.manifest`, `permonitorv2`). Because it draws its own title
+bar (`WindowStyle="None"` + `WindowChrome`), a window larger than the work area would put the
+caption buttons out of reach; the constructor therefore clamps width/height to
+`SystemParameters.WorkArea`, and each section body scrolls independently.
+
+## Distribution
+
+Two artifacts: the portable self-contained single-file exe (`artifacts/win-x64`) and an Inno Setup
+installer built from `installer/PocoUnlockAssistant.iss`. The installer writes to
+`%ProgramFiles%\PocoUnlockAssistant`, creates Start-menu and optional desktop shortcuts, and
+**never deletes `%APPDATA%\PocoUnlockAssistant`** on uninstall or upgrade — that directory holds the
+attempt database, settings, logs and evidence, and carries the duplicate-submission guard across
+reinstalls. Dependencies are kept current for security: `Microsoft.Data.Sqlite 10.0.15` supplies
+`SQLitePCLRaw 2.1.13` / SQLite 3.53.3, which clears CVE-2025-6965.
