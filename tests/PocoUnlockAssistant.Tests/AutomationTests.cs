@@ -11,7 +11,7 @@ public class AutomationTests
         new(text, id, string.Empty, "android.widget.TextView", enabled, clickable, new UiBounds(10, 10, 200, 60));
 
     private static UiNode Button(string text, bool enabled = true) =>
-        new(text, "com.miui.community:id/primary_button", string.Empty, "android.widget.Button",
+        new(text, "com.mi.global.bbs:id/primary_button", string.Empty, "android.widget.Button",
             enabled, true, new UiBounds(100, 1800, 880, 140));
 
     [Fact]

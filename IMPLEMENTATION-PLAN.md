@@ -79,7 +79,7 @@ These are the Phase 2 gates that could not be executed here; each needs the name
    1920x1080 and 2560x1440: title bar, all cards, all seven buttons, every section, shutdown,
    exception handling. Capture screenshots.
 2. **POCO F7** — authorize USB debugging, run the Diagnostics inspector, then replace the assumed
-   `com.miui.community` package id and marker strings with observed values in `screen-profile.json`.
+   `com.mi.global.bbs` marker strings with observed values in `screen-profile.json`.
 3. **Device gate matrix** — unauthorized, offline, USB unplug/replug during preparation, wrong
    screen, CAPTCHA; confirm the tap is always blocked.
 4. **Dry run** — Monitoring mode at a non-target time: recognition runs, no tap is sent.

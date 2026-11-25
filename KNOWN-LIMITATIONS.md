@@ -7,13 +7,15 @@
    100/125/150%, fonts, the live 50 ms countdown and every button still need a visual pass. The
    window is clamped to `SystemParameters.WorkArea` and its minimum size reduced to fit 1920x1080
    at 125% (1536x864 DIPs) and 150% (1280x720 DIPs) — a reasoned fix, **not an observed one**.
-2. **No POCO F7 was attached.** The ADB client itself was exercised live (`adb 1.0.41` detected,
-   `NotAttached` reported correctly), but `getprop`, `dumpsys`, `uiautomator dump`, `screencap` and
-   `input tap` have not been executed against a real HyperOS 3 device.
-3. **Xiaomi Community package id and screen markers are assumptions.** The default profile uses
-   `com.miui.community` with English/Indonesian marker strings. Confirm the package id and the
-   hierarchy on your device (Diagnostics → Inspect current screen) and edit
-   `%APPDATA%\PocoUnlockAssistant\screen-profile.json` if they differ.
+2. **A POCO F7 was attached over USB (2026-11-25).** `adb devices -l` reported serial `1893e6e8`
+   (model `25053PC47G`, product `onyx_global`); the app probe reached `Ready`, resolved market name
+   `POCO F7` and HyperOS `OS3.0.303.0.WOLIDXM` via `getprop`, and ran `dumpsys battery` / `dumpsys
+   power`. `uiautomator dump`, `screencap` and `input tap` have still not been exercised on hardware.
+3. **Xiaomi Community screen markers are still assumptions.** The package id was observed on the
+   POCO F7 as `com.mi.global.bbs` (Xiaomi Community Global 5.4.40, launcher
+   `com.mi.global.bbslib.headlines.ui.SplashActivity`) and is now the default. The English/Indonesian
+   marker strings have not been confirmed on the real hierarchy: use Diagnostics → Inspect current
+   screen and edit `%APPDATA%\PocoUnlockAssistant\screen-profile.json` if they differ.
 4. **Chinese-locale UI strings are not covered** by the shipped recognition profile.
 
 ## Functional gaps
@@ -59,6 +61,8 @@
 18. **Windows-specific network and clock behaviour** (NTP through the Windows stack, a manual
     Windows clock change mid-countdown, sleep/resume) is untested; the live NTP evidence is from
     macOS.
-19. **No real ADB workflow was executed.** `adb devices -l` runs and correctly reports zero
-    devices, but `getprop`, `dumpsys`, `uiautomator dump`, `screencap`, `input tap`, USB
-    disconnect/reconnect, unauthorized and offline states were only simulated in unit tests.
+19. **Only part of the ADB workflow was executed on hardware.** `adb devices -l`, `getprop`,
+    `dumpsys battery` and `dumpsys power` ran against the attached POCO F7; `uiautomator dump`,
+    `screencap`, `input tap`, USB disconnect/reconnect, unauthorized and offline states remain
+    simulated in unit tests.
+

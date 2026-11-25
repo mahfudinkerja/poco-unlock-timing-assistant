@@ -29,7 +29,7 @@ public sealed class SchedulerTests : IDisposable
     private static IReadOnlyList<UiNode> UnlockScreen =>
     [
         Node("Unlock Bootloader"),
-        new UiNode("Apply", "com.miui.community:id/primary_button", string.Empty, "android.widget.Button",
+        new UiNode("Apply", "com.mi.global.bbs:id/primary_button", string.Empty, "android.widget.Button",
             true, true, new UiBounds(100, 1800, 880, 140)),
     ];
 

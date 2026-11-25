@@ -104,7 +104,7 @@ Statuses are restricted to PASS / FAIL / BLOCKED / NOT TESTED.
 | NTP | Live synchronization | **PASS** (host-level) | 3/3 responders, +79.3 ms, uncertainty 8.4 ms, Healthy, trustworthy ≤150 ms — macOS run | Not executed on Windows; Windows clock-adjustment and drift untested |
 | ADB | Real device | **BLOCKED** | `adb devices -l` → empty list, exit 0; adb 1.0.41 present | No POCO F7 attached; getprop/dumpsys/uiautomator/screencap/input never run on hardware |
 | Device detection | POCO F7 | **NOT TESTED** | Parser unit-tested on captured-format strings only | Model/HyperOS/serial/battery/screen values unverified |
-| Xiaomi Community | Package verification | **NOT TESTED** | `com.miui.community` is still an assumption | Package id, version and screen markers unconfirmed |
+| Xiaomi Community | Package verification | **NOT TESTED** | `com.mi.global.bbs` observed on POCO F7 (v5.4.40) | Screen markers still unconfirmed |
 | UIAutomator | Actual hierarchy | **NOT TESTED** | Inspector implemented; fakes used in tests | No real hierarchy captured; CAPTCHA/security markers unverified |
 | Screen recognition | Actual screen | **NOT TESTED** | 16 automation tests on simulated hierarchies | Real layout may differ; recognition may fail |
 | Scheduler | Safety gates | **PASS** (simulated) / **NOT TESTED** (device) | 10 scheduler tests: exactly one tap, no late submit, emergency stop, wrong screen blocked, duplicate arm rejected, restart-safe dedupe | Gates never evaluated against a live device |

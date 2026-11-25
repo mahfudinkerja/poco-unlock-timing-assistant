@@ -18,7 +18,7 @@ public sealed class AssistantSettings
     public bool EnableEvidenceScreenshots { get; set; } = true;
     public ExecutionMode ExecutionMode { get; set; } = ExecutionMode.ControlledAdb;
     public string[] NtpServers { get; set; } = ["time.google.com", "time.cloudflare.com", "pool.ntp.org"];
-    public string CommunityPackageId { get; set; } = "com.miui.community";
+    public string CommunityPackageId { get; set; } = "com.mi.global.bbs";
     public string? AdbPath { get; set; }
 
     [JsonIgnore]

@@ -47,6 +47,8 @@ public sealed record AttemptRow(
 public partial class MainViewModel : ObservableObject, IDisposable
 {
     private const int MaxLogLines = 400;
+    private static readonly TimeSpan DeviceProbeInterval = TimeSpan.FromSeconds(3);
+    private static readonly TimeSpan CriticalWindow = TimeSpan.FromSeconds(15);
 
     private readonly SubmissionCoordinator _coordinator;
     private readonly SettingsStore _settingsStore;
@@ -60,6 +62,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private DateTimeOffset? _armedTarget;
     private DateTimeOffset _cachedTarget;
     private int _lastSecond = -1;
+    private DateTimeOffset _lastDeviceProbe = DateTimeOffset.MinValue;
+    private string? _lastSeenDeviceSignature;
     private bool _disposed;
 
     public MainViewModel(
@@ -88,6 +92,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _timer.Tick += OnTick;
         _timer.Start();
 
+        _lastDeviceProbe = _coordinator.Now;
         OnTick(this, EventArgs.Empty);
         _ = InitializeAsync();
     }
@@ -220,6 +225,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
             remaining = TimeSpan.Zero;
         }
 
+        if (!IsBusy && now - _lastDeviceProbe > DeviceProbeInterval)
+        {
+            _lastDeviceProbe = now;
+            _ = RefreshDeviceAsync();
+        }
+
         CountdownDays = ((int)remaining.TotalDays).ToString("00");
         CountdownHours = remaining.Hours.ToString("00");
         CountdownMinutes = remaining.Minutes.ToString("00");
@@ -296,11 +307,39 @@ public partial class MainViewModel : ObservableObject, IDisposable
         finally
         {
             IsBusy = false;
+            _lastDeviceProbe = _coordinator.Now;
+        }
+    }
+
+    private async Task RefreshDeviceAsync()
+    {
+        try
+        {
+            var list = await _adb.ExecuteAsync("devices -l");
+            var entries = AdbOutputParser.ParseDeviceList(list.StandardOutput);
+            var signature = string.Join("|", entries.Select(e => $"{e.Serial}:{e.State}"));
+            if (signature == _lastSeenDeviceSignature)
+            {
+                return;
+            }
+
+            if (_coordinator.Remaining <= CriticalWindow)
+            {
+                return;
+            }
+
+            var info = await _adb.ProbeAsync();
+            Dispatch(() => ApplyDevice(info));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Background device probe failed.");
         }
     }
 
     private void ApplyDevice(AdbDeviceInfo info)
     {
+        _lastSeenDeviceSignature = string.Join("|", info.Devices.Select(e => $"{e.Serial}:{e.State}"));
         DeviceModel = info.IsReady ? info.DisplayModel : "POCO F7";
         DeviceDetail = info.IsReady
             ? $"{info.DisplayModel} · {info.SerialNumber}"
@@ -438,12 +477,21 @@ public partial class MainViewModel : ObservableObject, IDisposable
         IsBusy = true;
         try
         {
+            var installed = await _adb.IsInstalledAsync(Settings.CommunityPackageId);
+            if (!installed)
+            {
+                CommunityStatus = $"NOT INSTALLED: {Settings.CommunityPackageId}";
+                CommunityKind = StatusKind.Error;
+                StatusMessage = $"Xiaomi Community ({Settings.CommunityPackageId}) is not installed on the phone. Install it from the official store, sign in manually, then click OPEN XIAOMI COMMUNITY again.";
+                return;
+            }
+
             var launched = await _adb.LaunchAppAsync(Settings.CommunityPackageId);
-            CommunityStatus = launched ? "Launched — sign in manually" : "Launch failed";
-            CommunityKind = launched ? StatusKind.Ok : StatusKind.Warn;
+            CommunityStatus = launched ? "Launched — sign in manually" : "Launch failed — open it manually";
+            CommunityKind = launched ? StatusKind.Ok : StatusKind.Error;
             StatusMessage = launched
                 ? "Xiaomi Community launched. Sign in manually, then open Me → Unlock Bootloader."
-                : $"Could not launch {Settings.CommunityPackageId}. Install Xiaomi Community and connect the device.";
+                : $"Xiaomi Community is installed but could not be launched. Open it manually on the phone and go to Me → Unlock Bootloader.";
         }
         catch (Exception ex)
         {

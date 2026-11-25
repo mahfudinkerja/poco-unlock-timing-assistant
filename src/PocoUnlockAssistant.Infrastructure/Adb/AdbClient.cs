@@ -261,6 +261,30 @@ public sealed class AdbClient : IAdbClient
 
     public async Task<bool> LaunchAppAsync(string packageId, CancellationToken cancellationToken = default)
     {
+        var installed = await IsInstalledAsync(packageId, cancellationToken).ConfigureAwait(false);
+        if (!installed)
+        {
+            return false;
+        }
+
+        var resolved = await ExecuteAsync(
+            $"shell cmd package resolve-activity --brief -c android.intent.category.LAUNCHER -a android.intent.action.MAIN {packageId}",
+            cancellationToken).ConfigureAwait(false);
+        if (resolved.Ok)
+        {
+            var component = resolved.StandardOutput.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .LastOrDefault(line => line.Contains('/', StringComparison.Ordinal));
+            if (!string.IsNullOrWhiteSpace(component))
+            {
+                var started = await ExecuteAsync($"shell am start -n {component}", cancellationToken)
+                    .ConfigureAwait(false);
+                if (started.Ok)
+                {
+                    return true;
+                }
+            }
+        }
+
         var result = await ExecuteAsync(
             $"shell monkey -p {packageId} -c android.intent.category.LAUNCHER 1", cancellationToken)
             .ConfigureAwait(false);

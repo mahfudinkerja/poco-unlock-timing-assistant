@@ -47,7 +47,7 @@ public sealed record ScreenMarker(ScreenKind Kind, IReadOnlyList<string> Texts);
 public sealed class ScreenRecognitionProfile
 {
     public string Name { get; set; } = "default";
-    public string PackageId { get; set; } = "com.miui.community";
+    public string PackageId { get; set; } = "com.mi.global.bbs";
     public string Notes { get; set; } = string.Empty;
     public List<ScreenMarker> Markers { get; set; } = [];
     public List<string> SubmitButtonTexts { get; set; } = [];
@@ -62,7 +62,7 @@ public sealed class ScreenRecognitionProfile
     public static ScreenRecognitionProfile CreateDefault() => new()
     {
         Name = "xiaomi-community-default",
-        PackageId = "com.miui.community",
+        PackageId = "com.mi.global.bbs",
         Notes = "Verify package id and screen markers on the target POCO F7 before arming automation.",
         Markers =
         [
@@ -108,7 +108,7 @@ public sealed class ScreenRecognitionProfile
         [
             "apply", "ajukan", "request", "minta", "unlock", "buka", "submit", "kirim", "confirm", "konfirmasi",
         ],
-        SubmitButtonIds = ["com.miui.community:id/", "button", "submit", "apply"],
+        SubmitButtonIds = ["com.mi.global.bbs:id/", "com.miui.community:id/", "button", "submit", "apply"],
     };
 }
 
